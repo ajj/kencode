@@ -1,5 +1,5 @@
 complicated_guide : complicated_guide.o cylindrical_guide.o guide_section.o bin.o cross.o refl.o real_def.o read_char_line.o read_real_line.o makefilename.o initialise_random.o random.o
-	gfortran -L/usr/X11/lib -lX11 -Wl,-framework -Wl,Foundation -L/usr/lib -lpng -lz -laquaterm -L/usr/lib/pgplot -lpgplot -o complicated_guide complicated_guide.o cylindrical_guide.o guide_section.o bin.o cross.o refl.o real_def.o read_char_line.o read_real_line.o makefilename.o initialise_random.o random.o
+	gfortran -L/usr/X11/lib -lX11 -Wl,-framework -Wl,Foundation -L/usr/lib -lpng -lz -L/usr/local/pgplot -lpgplot -o complicated_guide complicated_guide.o cylindrical_guide.o guide_section.o bin.o cross.o refl.o real_def.o read_char_line.o read_real_line.o makefilename.o initialise_random.o random.o
 
 complicated_guide.o : complicated_guide.for
 	gfortran -c complicated_guide.for
