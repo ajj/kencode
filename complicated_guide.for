@@ -1,6 +1,6 @@
 		PROGRAM complicated_guide
 
-c Monte Carlo calculation of guide divergence for arbitrary guide geometry. 
+c Monte Carlo calculation of guide divergence for arbitrary guide geometry.
 c
 c										last modified 26/9/10
 
@@ -10,100 +10,100 @@ c										last modified 26/9/10
 		INCLUDE 'c_bin.inc'
 		INCLUDE 'c_plot.inc'
 
-		REAL*8	Lguide(msections), Lexit, L, Lap, Lend, Lmon, rtime, 
-     &nsigmaS, lambdamin, lambdamax, dlambda, lambda_arr(mlambda), 
+		REAL*8	Lguide(msections), Lexit, L, Lap, Lend, Lmon, rtime,
+     &nsigmaS, lambdamin, lambdamax, dlambda, lambda_arr(mlambda),
      &lambda0
-		DIMENSION nthrough(msections,2), nmon(2), ncentral(3,2), 
-     &dLguide(msections), dvar(mvars), iusevars(mvars), 
-     &nUCN(2), PsumUCN(2), xloss(2,2), array(marray), 
-     &Rguide0(msections,4), 
-     &scan_arr(mscan), iscan_nmultiple(msections), 
-     &iscan_gmultiple(msections), iscan_dLguide(msections), 
-     &iscan_Wguide(msections,2), iscan_Hguide(msections,2), 
-     &iscan_Lguide(msections), iscan_Rguide(msections,4), 
-     &iscan_mnumber(msections,5), iscan_refl0(msections,5), 
-     &iscan_reflm(msections,5), iscan_Wwav(msections,5), 
-     &iscan_tilt(msections,5), iscan_gshift(msections,5), 
-     &iscan_chamfer(msections,5) 
-		REAL*4	xmin, xmax, ymin, ymax, zmin, zmax, xp(101), yp(101), 
-     &zp(101), xplot(2*nbin+1), yplot(2*nbin+1), eplot(2*nbin+1), 
-     &yyr, zzr, phiyyr, phizzr, rlambda
-		CHARACTER vname(mvars,2)*12, vblurb(mvars)*50, filename*50, 
-     &Answer*1, blurb*50, title*80, input_file*50, 
-     &string*50, out_file*50, ctime*8, source_file*50, cpol*1, 
-     &line*(nline), charr(marray)*40, scanvarname*10, FMT*40, LFMT*120, 
+		DIMENSION nthrough(msections,2), nmon(2), ncentral(3,2),
+     &dLguide(msections), dvar(mvars), iusevars(mvars),
+     &nUCN(2), PsumUCN(2), xloss(2,2), array(marray),
+     &Rguide0(msections,4),
+     &scan_arr(mscan), iscan_nmultiple(msections),
+     &iscan_gmultiple(msections), iscan_dLguide(msections),
+     &iscan_Wguide(msections,2), iscan_Hguide(msections,2),
+     &iscan_Lguide(msections), iscan_Rguide(msections,4),
+     &iscan_mnumber(msections,5), iscan_refl0(msections,5),
+     &iscan_reflm(msections,5), iscan_Wwav(msections,5),
+     &iscan_tilt(msections,5), iscan_gshift(msections,5),
+     &iscan_chamfer(msections,5)
+		REAL*4	xmin, xmax, ymin, ymax, zmin, zmax, xp(101), yp(101),
+     &zp(101), xplot(2*nbin+1), yplot(2*nbin+1), eplot(2*nbin+1),
+     &yyr, zzr, phiyyr, phizzr, rlambda, random
+		CHARACTER vname(mvars,2)*12, vblurb(mvars)*50, filename*50,
+     &Answer*1, blurb*50, title*80, input_file*50,
+     &string*50, out_file*50, ctime*8, source_file*50, cpol*1,
+     &line*(nline), charr(marray)*40, scanvarname*10, FMT*40, LFMT*120,
      &line0*(nline)
-		LOGICAL	through, binit, printrays, OK, exist, 
-     &saveneutrons, batchjob, hitmon, saveresults, 
-     &keepgoing, polarised, saveplot, usesavedneutrons, 
-     &cylindrical(msections), UCN, intube, looplambda, 
-     &saveplots, plot, showplots, circular_source, 
-     &cylindrical_source, 
-     &collimated_source, in, hparabolic(msections), 
-     &vparabolic(msections), curved(msections), refl_file, scan, 
-     &wrange, cavity(msections), polarised_in, newneutron, 
+		LOGICAL	through, binit, printrays, OK, exist,
+     &saveneutrons, batchjob, hitmon, saveresults,
+     &keepgoing, polarised, saveplot, usesavedneutrons,
+     &cylindrical(msections), UCN, intube, looplambda,
+     &saveplots, plot, showplots, circular_source,
+     &cylindrical_source,
+     &collimated_source, in, hparabolic(msections),
+     &vparabolic(msections), curved(msections), refl_file, scan,
+     &wrange, cavity(msections), polarised_in, newneutron,
      &screeninput, nooutput
 
 		DATA pi/3.141592654/, g/9.82E-03/, const/3956./,	! in units of mm and ms
-     &vblurb(2*msections+1)/'Hor pos at exit of last segment'/, 
-     &vname(2*msections+1,1)/'_yexit_'/, 
-     &dvar(2*msections+1)/1.0/, 
-     &vname(2*msections+1,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+2)/'Ver pos at exit of last segment'/,  
-     &vname(2*msections+2,1)/'_zexit_'/, 
-     &dvar(2*msections+2)/1.0/, 
-     &vname(2*msections+2,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+3)/'Horizontal divergence on monitor'/, 
-     &vname(2*msections+3,1)/'phiHsam'/, 
-     &dvar(2*msections+3)/0.01/, 
-     &vname(2*msections+3,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+4)/'Vertical divergence on monitor'/, 
-     &vname(2*msections+4,1)/'phiVsam'/, 
-     &dvar(2*msections+4)/0.01/, 
-     &vname(2*msections+4,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+5)/'Horizontal position at monitor'/, 
-     &vname(2*msections+5,1)/'ysample'/, 
-     &dvar(2*msections+5)/.50/, 
-     &vname(2*msections+5,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+6)/'Vertical position at monitor'/, 
-     &vname(2*msections+6,1)/'_zexit_'/, 
-     &dvar(2*msections+6)/.50/, 
-     &vname(2*msections+6,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+7)/'Total flight path'/, 
-     &vname(2*msections+7,1)/'Ltotal_'/, 
-     &vname(2*msections+7,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+8)/'Total number of reflections'/, 
-     &vname(2*msections+8,1)/'_Nrefl_'/, 
-     &dvar(2*msections+8)/1.0/, 
-     &vname(2*msections+8,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+9)/'Neutron losses in guide gaps'/, 
-     &vname(2*msections+9,1)/'xloss0_'/, 
-     &dvar(2*msections+9)/100.0/, 
-     &vname(2*msections+9,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+10)/'Neutron losses on face 1'/, 
-     &vname(2*msections+10,1)/'xloss1_'/, 
-     &dvar(2*msections+10)/100.0/, 
-     &vname(2*msections+10,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+11)/'Neutron losses on face 2'/, 
-     &vname(2*msections+11,1)/'xloss2_'/, 
-     &dvar(2*msections+11)/100.0/, 
-     &vname(2*msections+11,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+12)/'Neutron losses on face 3'/, 
-     &vname(2*msections+12,1)/'xloss3_'/, 
-     &dvar(2*msections+12)/100.0/, 
-     &vname(2*msections+12,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+13)/'Neutron losses on face 4'/, 
-     &vname(2*msections+13,1)/'xloss4_'/, 
-     &dvar(2*msections+13)/100.0/, 
-     &vname(2*msections+13,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+14)/'Neutron losses on face 5'/, 
-     &vname(2*msections+14,1)/'xloss5_'/, 
-     &dvar(2*msections+14)/100.0/, 
-     &vname(2*msections+14,2)/'Neutrons/bin'/, 
-     &vblurb(2*msections+15)/'Neutron losses on face 6'/, 
-     &vname(2*msections+15,1)/'xloss6_'/, 
-     &dvar(2*msections+15)/100.0/, 
-     &vname(2*msections+15,2)/'Neutrons/bin'/, 
+     &vblurb(2*msections+1)/'Hor pos at exit of last segment'/,
+     &vname(2*msections+1,1)/'_yexit_'/,
+     &dvar(2*msections+1)/1.0/,
+     &vname(2*msections+1,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+2)/'Ver pos at exit of last segment'/,
+     &vname(2*msections+2,1)/'_zexit_'/,
+     &dvar(2*msections+2)/1.0/,
+     &vname(2*msections+2,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+3)/'Horizontal divergence on monitor'/,
+     &vname(2*msections+3,1)/'phiHsam'/,
+     &dvar(2*msections+3)/0.01/,
+     &vname(2*msections+3,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+4)/'Vertical divergence on monitor'/,
+     &vname(2*msections+4,1)/'phiVsam'/,
+     &dvar(2*msections+4)/0.01/,
+     &vname(2*msections+4,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+5)/'Horizontal position at monitor'/,
+     &vname(2*msections+5,1)/'ysample'/,
+     &dvar(2*msections+5)/.50/,
+     &vname(2*msections+5,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+6)/'Vertical position at monitor'/,
+     &vname(2*msections+6,1)/'_zexit_'/,
+     &dvar(2*msections+6)/.50/,
+     &vname(2*msections+6,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+7)/'Total flight path'/,
+     &vname(2*msections+7,1)/'Ltotal_'/,
+     &vname(2*msections+7,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+8)/'Total number of reflections'/,
+     &vname(2*msections+8,1)/'_Nrefl_'/,
+     &dvar(2*msections+8)/1.0/,
+     &vname(2*msections+8,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+9)/'Neutron losses in guide gaps'/,
+     &vname(2*msections+9,1)/'xloss0_'/,
+     &dvar(2*msections+9)/100.0/,
+     &vname(2*msections+9,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+10)/'Neutron losses on face 1'/,
+     &vname(2*msections+10,1)/'xloss1_'/,
+     &dvar(2*msections+10)/100.0/,
+     &vname(2*msections+10,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+11)/'Neutron losses on face 2'/,
+     &vname(2*msections+11,1)/'xloss2_'/,
+     &dvar(2*msections+11)/100.0/,
+     &vname(2*msections+11,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+12)/'Neutron losses on face 3'/,
+     &vname(2*msections+12,1)/'xloss3_'/,
+     &dvar(2*msections+12)/100.0/,
+     &vname(2*msections+12,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+13)/'Neutron losses on face 4'/,
+     &vname(2*msections+13,1)/'xloss4_'/,
+     &dvar(2*msections+13)/100.0/,
+     &vname(2*msections+13,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+14)/'Neutron losses on face 5'/,
+     &vname(2*msections+14,1)/'xloss5_'/,
+     &dvar(2*msections+14)/100.0/,
+     &vname(2*msections+14,2)/'Neutrons/bin'/,
+     &vblurb(2*msections+15)/'Neutron losses on face 6'/,
+     &vname(2*msections+15,1)/'xloss6_'/,
+     &dvar(2*msections+15)/100.0/,
+     &vname(2*msections+15,2)/'Neutrons/bin'/,
      &Si_lambda/0.0,0.20229,0.40457,0.52230,0.63968,0.90465,
      &1.0813,1.2794,1.4304,1.6517,2.0229,2.8607,3.4192,
      &4.0457,4.5232,5.2230,6.3968,9.0465,100.0/, ! wavelength in Å
@@ -327,7 +327,7 @@ c Read from input unit
 				ivcavity(i)=0
 				READ(in_unit,'(A80)') line
 				CALL read_real_line(line,array,narray)
-				IF (charr(2).EQ.'STRAIGHT' .OR. 
+				IF (charr(2).EQ.'STRAIGHT' .OR.
      &charr(2).EQ.'CONVERGING' .OR. charr(2).EQ.'DIVERGING') THEN
 					IF (charr(3).EQ.'MULTIPLE') THEN
 						IF (narray.NE.2) GOTO 100
@@ -352,9 +352,9 @@ c Read from input unit
 						GOTO 100
 					END IF
 				ELSE IF (charr(2).EQ.'CURVED' .OR.
-     &charr(2).EQ.'CURVED_CONVERGING' .OR. 
-     &charr(2).EQ.'CONVERGING_CURVED' .OR. 
-     &charr(2).EQ.'CURVED_DIVERGING' .OR. 
+     &charr(2).EQ.'CURVED_CONVERGING' .OR.
+     &charr(2).EQ.'CONVERGING_CURVED' .OR.
+     &charr(2).EQ.'CURVED_DIVERGING' .OR.
      &charr(2).EQ.'DIVERGING_CURVED') THEN
 					IF (charr(3).EQ.'MULTIPLE') THEN
 						IF (narray.NE.2) GOTO 100
@@ -397,8 +397,8 @@ c Read from input unit
 					Wguide(i,2)=Wguide(i,1)
 					Hguide(i,2)=Hguide(i,1)
 					Rguide0(i,1)=0.
-				ELSE IF (charr(2).EQ.'PARABOLIC' .OR. 
-     &charr(2).EQ.'HORIZONTALLY_PARABOLIC' .OR. 
+				ELSE IF (charr(2).EQ.'PARABOLIC' .OR.
+     &charr(2).EQ.'HORIZONTALLY_PARABOLIC' .OR.
      &charr(2).EQ.'VERTICALLY_PARABOLIC') THEN
 					IF (charr(3).EQ.'MULTIPLE') THEN
 						IF (narray.NE.2) GOTO 100
@@ -565,7 +565,7 @@ c					Qarr(i,iside,ipol,i)=4.*pi*SIN(array(1)*pi/180.)/7.5	! T3 data
    42				nQ(i,iface)=iQ-1
 					CLOSE(15)
 					DO il=1,nline-1
-						IF (line(il:il).NE.' ' .AND.  
+						IF (line(il:il).NE.' ' .AND.
      &line(il+1:il+1).EQ.' ') GOTO 45
 					END DO
    45				nl=il
@@ -588,10 +588,10 @@ c					Qarr(i,iside,ipol,i)=4.*pi*SIN(array(1)*pi/180.)/7.5	! T3 data
 					IF (narray.GE.3) THEN
 						reflm(i,iface)=array(3)
 					ELSE
-						IF (mnumber(i,iface).GT.1.) 
+						IF (mnumber(i,iface).GT.1.)
      &reflm(i,iface)=refl0(i,iface)-0.1*(mnumber(i,iface)-1.)
 						IF (mnumber(i,iface).GT.1.119 .AND. 	! make an exception for Ni-58
-     &mnumber(i,iface).LT.1.201) reflm(i,iface)=1.0					
+     &mnumber(i,iface).LT.1.201) reflm(i,iface)=1.0
 					END IF
 					IF (narray.GE.4) Wwav(i,iface)=array(4)
 					IF (narray.GE.5) tilt(i,iface)=array(5)
@@ -599,8 +599,8 @@ c					Qarr(i,iside,ipol,i)=4.*pi*SIN(array(1)*pi/180.)/7.5	! T3 data
 					IF (narray.GE.6) gshift(i,iface)=array(6)
 					IF (narray.GE.7) chamfer(i,iface)=array(7)
 					IF (show) PRINT*,'m =',REAL(mnumber(i,iface)),
-     &' R0 =',REAL(refl0(i,iface)),' Rm =',REAL(reflm(i,iface)), 
-     &' Wwav =',REAL(Wwav(i,iface)),' tilt=',REAL(tilt(i,iface)), 
+     &' R0 =',REAL(refl0(i,iface)),' Rm =',REAL(reflm(i,iface)),
+     &' Wwav =',REAL(Wwav(i,iface)),' tilt=',REAL(tilt(i,iface)),
      &' shift =',REAL(gshift(i,iface)),
      &' chamfer=',REAL(chamfer(i,iface))
 					IF (mnumber(i,iface).LT.0.) polarised=.TRUE.
@@ -677,19 +677,19 @@ c		READ(*,'(A1)') Answer
 				Vmonshift=array(5)
 			ELSE
 				PRINT*,'Error - narray should be 3 or 5. It is =',narray
-			END IF	
+			END IF
 			IF (Lend.EQ.-999.) iscan_Lend=1
 			IF (Wmon.EQ.-999.) iscan_Wmon=1
 			IF (Hmon.EQ.-999.) iscan_Hmon=1
 			IF (Hmonshift.EQ.-999.) iscan_Hmonshift=1
 			IF (Vmonshift.EQ.-999.) iscan_Vmonshift=1
 		ELSE IF (charr(1).EQ.'GRAVITY' .AND. ncharr.GE.2) THEN
-			IF (charr(2).EQ.'SIDEWAYS' .OR. 
+			IF (charr(2).EQ.'SIDEWAYS' .OR.
      &(ncharr.EQ.3 .AND. charr(3).EQ.'SIDEWAYS')) sideways=.TRUE.
 			IF (sideways) gravity=.TRUE.
-			IF (charr(2).EQ.'OFF' .OR. 
+			IF (charr(2).EQ.'OFF' .OR.
      &(ncharr.EQ.3 .AND. charr(3).EQ.'OFF')) gravity=.FALSE.
-			IF (charr(2).EQ.'ON' .OR. 
+			IF (charr(2).EQ.'ON' .OR.
      &(ncharr.EQ.3 .AND. charr(3).EQ.'ON')) gravity=.TRUE.
 		ELSE IF (charr(1)(1:10).EQ.'WAVELENGTH') THEN
 			READ(in_unit,'(A80)') line
@@ -720,7 +720,7 @@ c		READ(*,'(A1)') Answer
 					PRINT*,'Error: narray should be 3. It is =',narray
 				END IF
 				nlambda=NINT((lambdamax-lambdamin)/dlambda)+1
-				WRITE(*,260) nlambda, lambdamin, dlambda, 
+				WRITE(*,260) nlambda, lambdamin, dlambda,
      &lambdamin+REAL(nlambda-1)*dlambda
   260			FORMAT(I6,' wavelengths:',F6.2,' (',F4.2,')',F6.2)
 				DO i=1,nlambda
@@ -761,7 +761,7 @@ c		READ(*,'(A1)') Answer
      &'Error - no scan points found in file: ',line
 				IF (.NOT.screeninput) WRITE(*,831) nscan
   831			FORMAT(I6,' scan points :')
-				IF (.NOT.screeninput) WRITE(*,832) 
+				IF (.NOT.screeninput) WRITE(*,832)
      &(i, scan_arr(i), i=1,nscan)
   832			FORMAT(' Scan point',I3,' ='F9.3)
 				scan=.TRUE.
@@ -776,7 +776,7 @@ c		READ(*,'(A1)') Answer
 					PRINT*,'Error: narray should be 3. It is =',narray
 				END IF
 				nscan=NINT((scanmax-scanmin)/dscan)+1
-				IF (.NOT.screeninput) WRITE(*,833) nscan, 
+				IF (.NOT.screeninput) WRITE(*,833) nscan,
      &scanmin, dscan, scanmin+REAL(nscan-1)*dscan
   833			FORMAT(I6,' scan points:',F9.3,' (',F6.3,')',F9.3)
 				DO i=1,nscan
@@ -805,7 +805,7 @@ c		READ(*,'(A1)') Answer
 			ELSE
 				PRINT*,'Error: narray should be 2. It is =',narray
 			END IF
-		ELSE IF (charr(1)(1:3).EQ.'END' .AND. 
+		ELSE IF (charr(1)(1:3).EQ.'END' .AND.
      &charr(2)(1:5).EQ.'INPUT') THEN
 			GOTO 90
 		ELSE IF (charr(1)(1:10).EQ.'ACCEPTANCE') THEN
@@ -820,11 +820,11 @@ c		READ(*,'(A1)') Answer
 
 		READ(in_unit,'(A80)') line
 		CALL read_char_line(line,charr,ncharr)
-		GOTO 70	
+		GOTO 70
 
    90	IF (.NOT.screeninput) CLOSE(in_unit)
 
-		IF (lambda.EQ.0. .AND. 
+		IF (lambda.EQ.0. .AND.
      &.NOT.(looplambda.OR.usesavedneutrons.OR.wrange)) THEN
 			PRINT*,'Error - wavelength has not been specified'
 		END IF
@@ -897,7 +897,7 @@ c	step up scan variable if there is one
 				IF (iscan_dLguide(i).EQ.1) dLguide(i)=scanvar
 				IF (iscan_Lguide(i).EQ.1) Lguide(i)=scanvar
 				DO j=1,2
-					IF (iscan_Rguide(i,2*j-1).EQ.1) 
+					IF (iscan_Rguide(i,2*j-1).EQ.1)
      &Rguide0(i,2*j-1)=scanvar*1.E+03
 					IF (iscan_Wguide(i,j).EQ.1) Wguide(i,j)=scanvar
 					IF (iscan_Hguide(i,j).EQ.1) Hguide(i,j)=scanvar
@@ -918,7 +918,7 @@ c	step up scan variable if there is one
 			IF (iscan_Hmonshift.EQ.1) Hmonshift=scanvar
 			IF (iscan_Vmonshift.EQ.1) Vmonshift=scanvar
 c			DO iface=1,4	! bodge for D17 S-bender
-c				IF (iscan_tilt(3,iface).EQ.1 .AND. 
+c				IF (iscan_tilt(3,iface).EQ.1 .AND.
 c     &iscan_tilt(6,iface).EQ.1) tilt(6,iface)=-tilt(3,iface)
 c			END DO
 		END IF
@@ -931,19 +931,19 @@ c Recalculate and show parameters from input file
 				PRINT*,' Source file : ',source_file
 			ELSE IF (collimated_source) THEN
 				IF (circular_source) THEN
-					WRITE(*,106) NINT(Wmod), NINT(halo), 
+					WRITE(*,106) NINT(Wmod), NINT(halo),
      &Hsourcem, Vsourcem
   106				FORMAT(
      &' Diameter of source, halo, Hor and Ver m-number'/,
      &2I5,2F6.2,5X,'- circular collimated source')
 				ELSE IF (cylindrical_source) THEN
-					WRITE(*,107) NINT(Wmod), NINT(Hmod), NINT(halo), 
+					WRITE(*,107) NINT(Wmod), NINT(Hmod), NINT(halo),
      &Hsourcem, Vsourcem
   107				FORMAT(
      &' W, H of source, halo, Hor and Ver m-number'/,
      &3I5,2F6.2,5X,'- cylindrical collimated source')
 				ELSE
-					WRITE(*,108) NINT(Wmod), NINT(Hmod), NINT(halo), 
+					WRITE(*,108) NINT(Wmod), NINT(Hmod), NINT(halo),
      &Hsourcem, Vsourcem
   108				FORMAT(
      &' W, H of source, halo, Hor and Ver m-number'/,
@@ -951,19 +951,19 @@ c Recalculate and show parameters from input file
 				END IF
 			ELSE
 				IF (circular_source) THEN
-					WRITE(*,109) NINT(Wmod), NINT(halo), 
+					WRITE(*,109) NINT(Wmod), NINT(halo),
      &NINT(Lap), NINT(Wap), NINT(Hap)
   109				FORMAT(
      &' Diameter of source, halo, Distance to and W, H',
      &' of virtual aperture'/,2I5,I6,2I5,5X,'- circular source')
 				ELSE IF (cylindrical_source) THEN
-					WRITE(*,110) NINT(Wmod), NINT(Hmod), NINT(halo), 
+					WRITE(*,110) NINT(Wmod), NINT(Hmod), NINT(halo),
      &NINT(Lap), NINT(Wap), NINT(Hap)
   110				FORMAT(
      &' W, H of source, halo, Distance to and W, H',
      &' of virtual aperture'/3I5,I6,2I5,5X,'- cylindrical source')
 				ELSE
-					WRITE(*,111) NINT(Wmod), NINT(Hmod), NINT(halo), 
+					WRITE(*,111) NINT(Wmod), NINT(Hmod), NINT(halo),
      &NINT(Lap), NINT(Wap), NINT(Hap)
   111				FORMAT(
      &' W, H of source, halo, Distance to and W, H',
@@ -1013,11 +1013,11 @@ c Recalculate and show parameters from input file
 				END IF
 			ELSE
 				tilt(i,1)=0.
-				IF (Lguide(i).GT.0.) 
+				IF (Lguide(i).GT.0.)
      &tilt(i,1)=ASIN((Wguide(i,1)-Wguide(i,2))/(2.*Lguide(i)))
 				tilt(i,2)=-tilt(i,1)
 				tilt(i,3)=0.
-				IF (Lguide(i).GT.0.) 
+				IF (Lguide(i).GT.0.)
      &tilt(i,3)=ASIN((Hguide(i,1)-Hguide(i,2))/(2.*Lguide(i)))
 				tilt(i,4)=-tilt(i,3)
 				IF (nfaces.EQ.1) THEN
@@ -1028,12 +1028,12 @@ c Recalculate and show parameters from input file
 					Vshift(i)=(gshift(i,3)+gshift(i,4))/2.
 				END IF
 			END IF
-			IF (.NOT.nooutput) WRITE(*,120) i, NINT(dLguide(i)), 
-     &NINT(Wguide(i,1)), NINT(Hguide(i,1)), NINT(Lguide(i)), 
-     &NINT(Wguide(i,2)), NINT(Hguide(i,2)), NINT(R), 
-     &NINT(Hshift(i)), NINT(Vshift(i)), 
+			IF (.NOT.nooutput) WRITE(*,120) i, NINT(dLguide(i)),
+     &NINT(Wguide(i,1)), NINT(Hguide(i,1)), NINT(Lguide(i)),
+     &NINT(Wguide(i,2)), NINT(Hguide(i,2)), NINT(R),
+     &NINT(Hshift(i)), NINT(Vshift(i)),
      &string(1:11), nmultiple(i), gmultiple(i)
-  120		FORMAT(' Guide',I2,' : Gap  W1   H1  Length  W2   H2', 
+  120		FORMAT(' Guide',I2,' : Gap  W1   H1  Length  W2   H2',
      &' Rc[m]  Hshift Vshift   type    nmulti gmulti'/
      &I13,2I5,I7,2I5,I7,I6,I7,3X,A11,I4,F7.3/
      &'    Face Pol Wav[deg] tilt[deg] chamfer m   R1     Rm')
@@ -1046,14 +1046,14 @@ c Recalculate and show parameters from input file
 				END IF
 				IF (.NOT.nooutput) THEN
 					IF (refl0(i,iface).LT.0.) THEN
-						WRITE(*,130) iface, string(1:3), 
-     &Wwav(i,iface)*180./pi, tilt(i,iface)*180./pi, 
+						WRITE(*,130) iface, string(1:3),
+     &Wwav(i,iface)*180./pi, tilt(i,iface)*180./pi,
      &chamfer(i,iface), reflfile(i,iface)(1:26)
   130					FORMAT(I7,2X,A3,3F7.3,1X,A26)
 					ELSE
-						WRITE(*,140) iface, string(1:3), 
-     &Wwav(i,iface)*180./pi, tilt(i,iface)*180./pi, 
-     &chamfer(i,iface), ABS(mnumber(i,iface)), 
+						WRITE(*,140) iface, string(1:3),
+     &Wwav(i,iface)*180./pi, tilt(i,iface)*180./pi,
+     &chamfer(i,iface), ABS(mnumber(i,iface)),
      &refl0(i,iface), reflm(i,iface)
   140					FORMAT(I7,2X,A3,6F7.3)
 					END IF
@@ -1062,7 +1062,7 @@ c Recalculate and show parameters from input file
 		END DO
 
 		IF (.NOT.nooutput) THEN
-			WRITE(*,150) NINT(Lend), NINT(Wmon), NINT(Hmon), 
+			WRITE(*,150) NINT(Lend), NINT(Wmon), NINT(Hmon),
      &NINT(Hmonshift), NINT(Vmonshift)
   150		FORMAT(' Distance between end of guide and mon,',
      &' mon width and height, Hor, Ver shift'/,5I6)
@@ -1156,15 +1156,7 @@ c		indebug=223
 			iusevars(i)=i+2*(msections-nsections)
 		END DO
 
-c		IF (iseed.EQ.0) THEN
-c			itime=TIME()
-c			iseed=4515415+itime*2
-c			OPEN(16,FILE='iseed.dat',STATUS='UNKNOWN')
-c			WRITE(16,*) iseed
-c			CLOSE(16)
-c		END IF
 		CALL initialise_random(iseed)
-c		CALL random_seed()
 
 		IF (printrays) neutrons=20
 
@@ -1383,7 +1375,7 @@ c Set up guide parameters
 					yc2(i)=ystart(i,2)+ycs2
 					xc2(i)=xstart(i,2)-TANphi*ycs2
 					Rguide(i,2)=ycs2*SQRT(1.+TANphi**2)
-				END IF	
+				END IF
 				zend(i,3)=zstart(i,3)+L*SIN(phig(i,3))
 				zend(i,4)=zstart(i,4)+L*SIN(phig(i,4))
 				zend0=(zend(i,3)+zend(i,4))/2.
@@ -1428,11 +1420,11 @@ c				WRITE(*,280) (j, phig(i,j)*180./pi, zstart(i,j), zend(i,j), j=3,4)
 		cw(nsections+1,1)=(xmon2-xmon1)/(ymon2-ymon1)
 		dw(nsections+1,1)=xmon1-cw(nsections+1,1)*ymon1
 
-		phiHexit0=phiH	! \ 
+		phiHexit0=phiH	! \
 		phiVexit0=phiV	!  | parameters at guide exit
 		yexit0=yend0	!  |
 		zexit0=zend0	! /
-		IF (.NOT.batchjob) WRITE(*,290) phiHexit0*180./pi, 
+		IF (.NOT.batchjob) WRITE(*,290) phiHexit0*180./pi,
      &phiVexit0*180./pi, yexit0, zexit0, ymon0, zmon0
   290	FORMAT('                           Horizontal  Vertical'/
      &' Direction of guide exit:  ',F7.2,F10.2,' deg'/
@@ -1822,14 +1814,14 @@ c---------------------------------------------------------
 				READ(21,*)
 				IF (.NOT.nooutput) THEN
 					IF (neutrons1.EQ.0 .AND. neutrons2.EQ.0) THEN
-						WRITE(*,226) lambda, neutrons0, 
+						WRITE(*,226) lambda, neutrons0,
      &MIN(neutrons,neutrons0)
   226					FORMAT('    lambda =',F7.3,' A'/
      &I10,' un-polarised neutrons saved'/
      &I10,' neutrons will be used in the present simulation')
 						neutrons=MIN(neutrons,neutrons0)
 					ELSE
-						WRITE(*,227) lambda, neutrons1, neutrons2, 
+						WRITE(*,227) lambda, neutrons1, neutrons2,
      &MIN(neutrons,neutrons1+neutrons2)
   227					FORMAT(12X,'    lambda =',F7.3,' A'/
      &I10,' /',I10,' up/down neutrons saved'/
@@ -1838,7 +1830,7 @@ c---------------------------------------------------------
 					END IF
 				END IF
 			ELSE
-				IF (.NOT.nooutput) WRITE(*,231) filename, lambda, 
+				IF (.NOT.nooutput) WRITE(*,231) filename, lambda,
      &neutrons
   231			FORMAT('    input file = ',A50/
      &'    lambda =',F7.3,' A'/
@@ -1877,7 +1869,7 @@ c Set up output file names and trajectory file
 				neutron02=0
   340			IF (polarised_in) THEN
 					IF (wrange) THEN
-						READ(12,*,END=350) rlambda, yyr, zzr, 
+						READ(12,*,END=350) rlambda, yyr, zzr,
      &phiyyr, phizzr, ipol
 					ELSE
 						READ(12,*,END=350) yyr, zzr, phiyyr, phizzr, ipol
@@ -1886,7 +1878,7 @@ c Set up output file names and trajectory file
 					IF (ipol.EQ.2) neutron02=neutron02+1
 				ELSE
 					IF (wrange) THEN
-						READ(12,*,END=350) rlambda, yyr, zzr, 
+						READ(12,*,END=350) rlambda, yyr, zzr,
      &phiyyr, phizzr
 					ELSE
 						READ(12,*,END=350) yyr, zzr, phiyyr, phizzr
@@ -2076,7 +2068,7 @@ c							PRINT*,'Hsourcem<0: phiy=',phiy,' gauss=',gauss
 				END IF
 				IF (UCN.AND.isection.EQ.nsections.AND.L.GE.0.) THEN
 					PUCN=(sigmaU/sigmaS)*(1.-EXP(-nsigmaS*L))
-					IF (show) WRITE(*,450) L, (1.-EXP(-nsigmaS*L))*100., 
+					IF (show) WRITE(*,450) L, (1.-EXP(-nsigmaS*L))*100.,
      &PUCN*100.
   450				FORMAT(' L(in He) =',F7.2,' mm  =>  P(scatt) =',F7.4,
      &' & P(UCN) =',F7.4,' %')
@@ -2085,7 +2077,7 @@ c							PRINT*,'Hsourcem<0: phiy=',phiy,' gauss=',gauss
 					PsumUCN(ipol)=PsumUCN(ipol)+PUCN
 				END IF
 				IF (xloss(1,ipol).GT.0.) THEN
-					IF (show) WRITE(*,460) ipol, NINT(xloss(2,ipol)), 
+					IF (show) WRITE(*,460) ipol, NINT(xloss(2,ipol)),
      &xloss(1,ipol), 2*msections+9+NINT(xloss(2,ipol))
   460				FORMAT('Pol',I1,' Side',I1,': xloss=',F8.2,
      &'mm, ivar=',I3)
@@ -2124,7 +2116,7 @@ c							PRINT*,'Hsourcem<0: phiy=',phiy,' gauss=',gauss
 					CALL bin(phiy*180./pi,2*isection-1,ipol) ! hor div at guide exit
 					CALL bin(phiz*180./pi,2*isection,ipol)   ! ver div at guide exit
 				END IF
-				IF (isection.EQ.nsections .AND. in) 
+				IF (isection.EQ.nsections .AND. in)
      &nstartlastsection=nstartlastsection+1
 c				IF (ABS(phiy*180./pi).GT.10.) PRINT*,'phiy=',phiy,
 c    &' ineutron=',ineutron
@@ -2134,9 +2126,9 @@ c    &' ineutron=',ineutron
 			CALL bin(yexit,2*msections+1,ipol)	! hor pos
 			CALL bin(zexit,2*msections+2,ipol)	! ver pos
 			IF (nmultiple(nsections).EQ.1) THEN
-				IF (ABS(yexit-yexit0).GT.1.1*Wguide(nsections,2)/2. .OR. 
+				IF (ABS(yexit-yexit0).GT.1.1*Wguide(nsections,2)/2. .OR.
      &ABS(zexit-zexit0).GT.1.1*Hguide(nsections,2)/2.) THEN
-					WRITE(*,465) ineutron, yexit, yexit0, Wguide(nsections,2), 
+					WRITE(*,465) ineutron, yexit, yexit0, Wguide(nsections,2),
      &zexit, zexit0, Hguide(nsections,2)
   465				FORMAT(' Warning - neutron',I10/
      &' y: neutron exit =',F7.2,' guide centre =',F7.2,' width =',F6.2/
@@ -2171,12 +2163,12 @@ c					READ(*,'(A1)') Answer
 			END IF
 			zmon=az*xmon+bz-0.5*gz*(xmon/v)**2
 
-			IF (ymon.GT.ymon1 .AND. ymon.LT.ymon2 .AND. 
+			IF (ymon.GT.ymon1 .AND. ymon.LT.ymon2 .AND.
      &zmon.GT.zmon1 .AND. zmon.LT.zmon2) hitmon=.TRUE.
 
-			IF (show) WRITE(*,470) ineutron, ymon1, ymon2, zmon1, zmon2, 
-     &yend(nsections,1), yend(nsections,2), 
-     &zend(nsections,3), zend(nsections,4), 
+			IF (show) WRITE(*,470) ineutron, ymon1, ymon2, zmon1, zmon2,
+     &yend(nsections,1), yend(nsections,2),
+     &zend(nsections,3), zend(nsections,4),
      &xexit, yexit, zexit, xmon, ymon, zmon
   470		FORMAT(' Neutron',I6,' :'/
      &' monitor y-range :',F8.2,' ->',F8.2,' mm'/
@@ -2202,7 +2194,7 @@ c					READ(*,'(A1)') Answer
      &ncentral(1,ipol)=ncentral(1,ipol)+1
 				IF (ABS(phiz-phiVexit0)*180./pi.LT.divlimit)			! within ver +/- divlimit degrees
      &ncentral(2,ipol)=ncentral(2,ipol)+1
-				IF (ABS(phiy-phiHexit0)*180./pi.LT.divlimit .AND. 
+				IF (ABS(phiy-phiHexit0)*180./pi.LT.divlimit .AND.
      &ABS(phiz-phiVexit0)*180./pi.LT.divlimit)			! within hor & ver +/- divlimit degrees
      &ncentral(3,ipol)=ncentral(3,ipol)+1
 c------------------------------------------------------------------------
@@ -2224,14 +2216,14 @@ c						zzr=REAL(zmon-zmon0)
 					END IF
 					IF (polarised) THEN
 						IF (wrange) THEN
-							WRITE(12,*) REAL(lambda), yyr, zzr, 
+							WRITE(12,*) REAL(lambda), yyr, zzr,
      &phiyyr, phizzr, ipol
 						ELSE
 							WRITE(12,*) yyr, zzr, phiyyr, phizzr, ipol
 						END IF
 					ELSE
 						IF (wrange) THEN
-							WRITE(12,*) REAL(lambda), yyr, zzr, 
+							WRITE(12,*) REAL(lambda), yyr, zzr,
      &phiyyr, phizzr
 						ELSE
 							WRITE(12,*) yyr, zzr, phiyyr, phizzr
@@ -2326,7 +2318,7 @@ c------------------------------------------------------------------------
 
 			IF (keepgoing) THEN
 				neutron0=neutron0+1
-				IF (neutrons*(neutron0/neutrons).EQ.neutron0) 
+				IF (neutrons*(neutron0/neutrons).EQ.neutron0)
      &PRINT*, neutron0,' neutrons:',nthrough(nsections,1),
      &' made it through'
 				IF (nmon(1)+neutron00.LT.neutrons) THEN
@@ -2339,7 +2331,7 @@ c------------------------------------------------------------------------
 		END DO	! main Monte Carlo loop
 
   600	CONTINUE
-  
+
 		IF (pn) CALL pgend
 
 		IF (keepgoing) THEN
@@ -2399,7 +2391,7 @@ c------------------------------------------------------------------------
   630			FORMAT(' Out of',I10,' neutrons at lambda=',F7.3,'A :')
 				WRITE(*,640) (nthrough(i,1), i, i=1,nsections)
   640			FORMAT(7X,I10,' made it through section',I2)
-				WRITE(*,650) nmon(1), ncentral(1,1), divlimit, 
+				WRITE(*,650) nmon(1), ncentral(1,1), divlimit,
      &ncentral(2,1), divlimit, ncentral(3,1), divlimit
   650			FORMAT(7X,I10,' hit the monitor'/
      &7X,I10,' hit the monitor within +/-',F5.2,' deg horizontally'/
@@ -2422,7 +2414,7 @@ c------------------------------------------------------------------------
   675				FORMAT(7X,I10,'/',I9,' made it into section',I2)
 					WRITE(*,670) (nthrough(nsections,i), i=1,2), nsections
 				END IF
-				WRITE(*,680) nmon(1), nmon(2), (ncentral(i,1), ncentral(i,2), 
+				WRITE(*,680) nmon(1), nmon(2), (ncentral(i,1), ncentral(i,2),
      &divlimit, i=1,3)
   680			FORMAT(7X,I10,'/',I9,' hit the monitor'/
      &7X,I10,'/',I9,' hit the monitor within +/-',F5.2,
@@ -2500,7 +2492,7 @@ c				GOTO 655	! use full 100% width instead of 90% width
 			IF (iv.EQ.4) wV=2.*w
 		END DO
 
-		IF (UCN .AND. .NOT.nooutput) WRITE(*,705) 
+		IF (UCN .AND. .NOT.nooutput) WRITE(*,705)
      &(100.*PsumUCN(i)/REAL(neutrons), i=1,2)
   705	FORMAT(F9.6,' /',F9.6,' % of incident neutrons created a UCN')
 
@@ -2561,28 +2553,28 @@ c				GOTO 655	! use full 100% width instead of 90% width
 				IF (scan) xvalue=scanvar
 				IF (nsections.LT.10) THEN
 					IF (UCN) THEN
-						WRITE(FMT,'("(F10.3,I10,",I1,"I10,2I10,F10.6)")') 
+						WRITE(FMT,'("(F10.3,I10,",I1,"I10,2I10,F10.6)")')
      &nsections
 					ELSE
-						WRITE(FMT,'("(F10.3,I10,",I1,"I10,4I10,2F8.2)")') 
+						WRITE(FMT,'("(F10.3,I10,",I1,"I10,4I10,2F8.2)")')
      &nsections
 					END IF
 				ELSE
 					IF (UCN) THEN
-						WRITE(FMT,'("(F10.3,I10,",I2,"I10,2I10,F10.6)")') 
+						WRITE(FMT,'("(F10.3,I10,",I2,"I10,2I10,F10.6)")')
      &nsections
 					ELSE
-						WRITE(FMT,'("(F10.3,I10,",I2,"I10,4I10,2F8.2)")') 
+						WRITE(FMT,'("(F10.3,I10,",I2,"I10,4I10,2F8.2)")')
      &nsections
 					END IF
 				END IF
 				IF (UCN) THEN
-					WRITE(10,FMT) xvalue, neutrons, 
-     &(nthrough(i,ipol), i=1,nsections), nmon(ipol), nUCN(ipol), 
+					WRITE(10,FMT) xvalue, neutrons,
+     &(nthrough(i,ipol), i=1,nsections), nmon(ipol), nUCN(ipol),
      &100.*PsumUCN(ipol)/REAL(neutrons)
 				ELSE
-					WRITE(10,FMT) xvalue, neutrons, 
-     &(nthrough(i,ipol), i=1,nsections), nmon(ipol), 
+					WRITE(10,FMT) xvalue, neutrons,
+     &(nthrough(i,ipol), i=1,nsections), nmon(ipol),
      &(ncentral(i,ipol), i=1,3), wH, wV
 				END IF
 				CLOSE(10)
@@ -2629,12 +2621,12 @@ c				GOTO 655	! use full 100% width instead of 90% width
 				ELSE
 					IF (ivar.LT.2*msections+9) THEN
 						DO i=-nbin,nbin
-							IF (binvar(ivar,1,i).GT.0. .OR. 
+							IF (binvar(ivar,1,i).GT.0. .OR.
      &binvar(ivar,2,i).GT.0.) GOTO 940
 						END DO
   940					imin=MAX(i-1,-nbin)
 						DO i=nbin,-nbin,-1
-							IF (binvar(ivar,1,i).GT.0. .OR. 
+							IF (binvar(ivar,1,i).GT.0. .OR.
      &binvar(ivar,2,i).GT.0.) GOTO 945
 						END DO
   945					imax=MIN(i+1,nbin)
@@ -2676,21 +2668,21 @@ c				GOTO 655	! use full 100% width instead of 90% width
 						PRINT*,'Saving ',out_file
 						OPEN(10,FILE=out_file,STATUS='UNKNOWN')
 						IF (npol.EQ.1) THEN
-							WRITE(10,960) vname(ivar,1), vname(ivar,2), 
+							WRITE(10,960) vname(ivar,1), vname(ivar,2),
      &vname(ivar,2)
   960						FORMAT(2X,A9,8X,A9,8X,'d',A9)
 							DO i=imin,imax
-								WRITE(10,*) xplot(i+nbin+1), 
+								WRITE(10,*) xplot(i+nbin+1),
      &yplot(i+nbin+1), eplot(i+nbin+1)
 							END DO
 						ELSE
-							WRITE(10,965) vname(ivar,1), vname(ivar,2), 
+							WRITE(10,965) vname(ivar,1), vname(ivar,2),
      &vname(ivar,2), vname(ivar,2), vname(ivar,2)
   965						FORMAT(2X,A9,8X,A9,'_1',8X,'d',A9,'_1',
      &8X,A9,'_2',8X,'d',A9,'_2')
 							DO i=imin,imax
 								y2=binvar(ivar,2,i)
-								WRITE(10,*) xplot(i+nbin+1), 
+								WRITE(10,*) xplot(i+nbin+1),
      &yplot(i+nbin+1), eplot(i+nbin+1), REAL(y2), REAL(SQRT(y2))
 							END DO
 						END IF
@@ -2702,7 +2694,7 @@ c				GOTO 655	! use full 100% width instead of 90% width
 						IF (ipol.EQ.1) THEN
 							CALL pgbegin(0,'/xw',1,1)
 							CALL pgask(.FALSE.)
-							WRITE(title,975) vblurb(ivar), vname(ivar,2), 
+							WRITE(title,975) vblurb(ivar), vname(ivar,2),
      &vname(ivar,1)
   975						FORMAT(A50,': ',A9,' vs ',A9)
 							xmin=xplot(imin+nbin+1)
@@ -2714,7 +2706,7 @@ c				GOTO 655	! use full 100% width instead of 90% width
 						CALL pgpt(2*nbin+1,xplot,yplot,im)
 						CALL pgerrb(6,2*nbin,xplot,yplot,eplot,0.)
 						IF (ipol.EQ.1) CALL pgline(2*nbin+1,xplot,yplot)
-						IF (ipol.EQ.1) 
+						IF (ipol.EQ.1)
      &CALL pglab(vname(ivar,1),vname(ivar,2),vblurb(ivar))
 						IF (ipol.EQ.2) CALL pgsci(1)
 					END IF	! if saveplot
@@ -2744,4 +2736,3 @@ c				GOTO 655	! use full 100% width instead of 90% width
 
  1000	STOP
 		END
-
