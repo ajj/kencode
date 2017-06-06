@@ -1,20 +1,21 @@
 !-----------------------------------------------------
-! Approximate geometry of Heritage guide
+! Approximate geometry of LoKI guide
 !-----------------------------------------------------
 !
 ! cold source
 !-----------------------------------------------------
 SOURCE RECTANGULAR					! W, H of source, Distance to and W, H of virtual aperture, (halo[*1])
-  30  200  2000   120  100
+  30  200  2000   25  30
 !
 ! Guide 1
 !-----------------------------------------------------
-GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
- 2000  30  95.8  10000  400  30  194.5
+GUIDE CURVED MULTIPLE	! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
+ 5 0
+ 2000  5 30 3500  61.25  5 30
    FACE 1 ! rhs (seen travelling with the neutron beam) bottom
     3
    FACE 2 ! lhs											top
-    4
+    3
    FACE 3 ! bottom										lhs
     3
    FACE 4 ! top											rhs
@@ -23,61 +24,23 @@ GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve i
 ! Guide 2
 !-----------------------------------------------------
 GUIDE STRAIGHT		! Gap, W, H at start, Length, (W, H at end)
- 0  30  194.5  1000  30  198.5
+ 5  25  30 6000  25  30
    FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    3
+    2
    FACE 2 ! lhs											top
-    3
+    2
    FACE 3 ! bottom										lhs
-    3
+    2
    FACE 4 ! top											rhs
-    3
+    2
 !
 ! Guide 3
 !-----------------------------------------------------
-GUIDE STRAIGHT		! Gap, W, H at start, Length, (W, H at end)
- 0  30  198.5  2000  30  202.7
+GUIDE CURVED MULTIPLE	! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
+ 5 0
+ 5  5  30  3500  -61.25  5  30
    FACE 1 ! rhs (seen travelling with the neutron beam) bottom
     3
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 4 - this can be replaced with transmission polariser
-!-----------------------------------------------------
-GUIDE STRAIGHT		! Gap, W, H at start, Length, (W, H at end)
- 0  30  202.7  4000  30  202.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    3
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 5
-!-----------------------------------------------------
-GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
- 0  30  202.5  6000  -400  30  180.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    4
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 6
-!-----------------------------------------------------
-GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
- 0  30  180.5  4000  -400  30  145.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    4
    FACE 2 ! lhs											top
     3
    FACE 3 ! bottom										lhs
@@ -88,18 +51,18 @@ GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve i
 ! monitor
 !-----------------------------------------------------
 END GUIDE			! Distance between end of guide and monitor, monitor width, height, H-shift, V-shift
-  0  12  150   9   0
+  5  25  30   0   0
 !
 !-----------------------------------------------------
 WAVELENGTH
-  10
+  6
 !
 !-----------------------------------------------------
 GRAVITY SIDEWAYS
 !
 !-----------------------------------------------------
 NEUTRONS ! Number of neutrons [*3*], seed for random number generator (0 : take a random odd number)
- 1000000    287349743
+ 100000    287349743
 !
 !-----------------------------------------------------
 OUTPUT	! iresults and idebug

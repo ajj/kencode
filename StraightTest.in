@@ -5,79 +5,14 @@
 ! cold source
 !-----------------------------------------------------
 SOURCE RECTANGULAR					! W, H of source, Distance to and W, H of virtual aperture, (halo[*1])
-  30  200  2000   120  100
+  30  200  2000   30  30
 !
 ! Guide 1
 !-----------------------------------------------------
-GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
- 2000  30  95.8  10000  400  30  194.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    3
-   FACE 2 ! lhs											top
-    4
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 2
-!-----------------------------------------------------
 GUIDE STRAIGHT		! Gap, W, H at start, Length, (W, H at end)
- 0  30  194.5  1000  30  198.5
+ 0  30  30  1000  30 30
    FACE 1 ! rhs (seen travelling with the neutron beam) bottom
     3
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 3
-!-----------------------------------------------------
-GUIDE STRAIGHT		! Gap, W, H at start, Length, (W, H at end)
- 0  30  198.5  2000  30  202.7
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    3
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 4 - this can be replaced with transmission polariser
-!-----------------------------------------------------
-GUIDE STRAIGHT		! Gap, W, H at start, Length, (W, H at end)
- 0  30  202.7  4000  30  202.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    3
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 5
-!-----------------------------------------------------
-GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
- 0  30  202.5  6000  -400  30  180.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    4
-   FACE 2 ! lhs											top
-    3
-   FACE 3 ! bottom										lhs
-    3
-   FACE 4 ! top											rhs
-    3
-!
-! Guide 6
-!-----------------------------------------------------
-GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve is down, +ve is up)
- 0  30  180.5  4000  -400  30  145.5
-   FACE 1 ! rhs (seen travelling with the neutron beam) bottom
-    4
    FACE 2 ! lhs											top
     3
    FACE 3 ! bottom										lhs
@@ -87,8 +22,8 @@ GUIDE CURVED		! Gap, W, H at start, Length, Rc[m] (W, H at end) (sideways: -ve i
 !
 ! monitor
 !-----------------------------------------------------
-END GUIDE			! Distance between end of guide and monitor, monitor width, height, H-shift, V-shift
-  0  12  150   9   0
+END GUIDE			! Distance between end of guide and monitor, monitor width, height, H-shift, V-shift    
+  0  30  30   0   0
 !
 !-----------------------------------------------------
 WAVELENGTH
@@ -98,8 +33,8 @@ WAVELENGTH
 GRAVITY SIDEWAYS
 !
 !-----------------------------------------------------
-NEUTRONS ! Number of neutrons [*3*], seed for random number generator (0 : take a random odd number)
- 1000000    287349743
+NEUTRONS ! Number of neutrons [*3*], seed for random number generator (0 : take a random odd number)                                          
+ 100000   0
 !
 !-----------------------------------------------------
 OUTPUT	! iresults and idebug
@@ -121,7 +56,7 @@ SOURCE CYLINDRICAL				! W, H of source[*2*], Distance to and W, H of virtual ape
 SOURCE RECTANGULAR_COLLIMATED	! W, H of source, Hor and Ver m-number of divergence, (halo[*1])
 SOURCE CIRCULAR_COLLIMATED		! W of source, Hor and Ver m-number of divergence, (halo[*1])
 SOURCE CYLINDRICAL_COLLIMATED	! W, H of source[*2*], Hor and Ver m-number of divergence, (halo[*1])
-SOURCE FILE						! name of input file. If you want to loop through wavelength,
+SOURCE FILE						! name of input file. If you want to loop through wavelength, 
 	you need to give the file name without the e.g. '_00500' bit, i.e. if the files are called
 	thingy_00100.dat, thingy_00200.dat, etc, you need to give thingy.dat as the file name here
 
@@ -136,7 +71,7 @@ GUIDE TRANSMISSION_MIRROR		! a Si-substrate mirror placed at an angle inside a g
 The surface properties must be described either for all faces, or each face individually:
    ALL FACES	! following line contains
 	or			! m-number[*3*], (refl up to m=1 and at edge, waviness[deg], tilt[deg], shift[mm], chamfer[mm])
-   ALL FACES FILE	! following line contains name of reflectivity file
+   ALL FACES FILE	! following line contains name of reflectivity file 
 or
    FACE 1 ! rhs (seen travelling with the neutron beam) bottom
 - line with numbers (same syntax as for ALL FACES) -
@@ -147,7 +82,7 @@ or
    FACE 4 ! top											rhs
 - line with numbers -
 Alternatively, the following syntax can be used
-   FACE 1 FILE	! following line contains name of reflectivity file which can optionally
+   FACE 1 FILE	! following line contains name of reflectivity file which can optionally 
 				! be followed by waviness[deg], tilt[deg], shift[mm], chamfer[mm]
 etc.
 For a transmission mirror, a fifth face is used which can have the following syntax
@@ -172,16 +107,16 @@ SCAN OFF		! default
 SCAN ON			! turns on scanning. The variable which has been given the value -999 is scanned
 				! following line contains first value, step and last value
 SCAN FILE		! turns on scanning. The variable which has been given the value -999 is scanned
-				! following line contains name of input file containing values of scan variable
+				! following line contains name of input file containing values of scan variable 
 				! - one per line in the input file
 
 GRAVITY ON		! turns gravity on
-GRAVITY OFF		! and off - or turns it
+GRAVITY OFF		! and off - or turns it 
 GRAVITY SIDEWAYS	! sideways if so desired
 
-NEUTRONS	! Number of neutrons, seed for random number generator (0: take a random odd number)
-			! If the number of neutrons is negative, the loop keeps going until the full number of
-			! neutrons has been transmitted.
+NEUTRONS	! Number of neutrons, seed for random number generator (0: take a random odd number)                                          
+			! If the number of neutrons is negative, the loop keeps going until the full number of 
+			! neutrons has been transmitted. 
 
 OUTPUT		! iresults, idebug:
  iresults:
@@ -190,7 +125,7 @@ OUTPUT		! iresults, idebug:
    1 : append transmission numbers to .out file
    2 : append transmission numbers to .out file and save all binned data
  idebug:
-  -2 : No output at all, except total number of neutrons (set screeninput to .FALSE. in main program
+  -2 : No output at all, except total number of neutrons (set screeninput to .FALSE. in main program 
        and recompile to take all input from screen and avoid prompting for input file)
   -1 : Batchjob - no graphics, no prompting
    0 : Normal interactive calculation, with prompts for output
@@ -200,16 +135,18 @@ OUTPUT		! iresults, idebug:
 END INPUT	! ignore everything after this
 
 Notes:
-[*1*] The source brightness is uniform over the area given by the width (and height). The halo
+[*1*] The source brightness is uniform over the area given by the width (and height). The halo 
       width describes a linear drop of brightness to zero outside the source area
-[*2*] For a cylindrical source, the source brightness over the width varies as sqrt((w/2)^2-r^2).
-      In this case, the halo is only applied in the vertical direction.
+[*2*] For a cylindrical source, the source brightness over the width varies as sqrt((w/2)^2-r^2). 
+      In this case, the halo is only applied in the vertical direction. 
 [*3*] Set the m-number to a negative value to denote polarising supermirror
 
-All dimensions are in mm, except the guide radius of curvature, which is in metres.
-By default, the reflectivity is 1 up to m=1, decreasing linearly down to 0.9 at m=2.
-The exception is for m=1.2, which corresponds to Ni-58, where the reflectivity is 1
-right up to the edge.
+All dimensions are in mm, except the guide radius of curvature, which is in metres. 
+By default, the reflectivity is 1 up to m=1, decreasing linearly down to 0.9 at m=2. 
+The exception is for m=1.2, which corresponds to Ni-58, where the reflectivity is 1 
+right up to the edge. 
 To avoid direct line-of-sight in a curved guide, Lguide > SQRT(8*width*Rcurv)
-The characteristic wavelength is the wavelength at which the curved guide is filled
+The characteristic wavelength is the wavelength at which the curved guide is filled 
 to 2/3 and is given by lambda(star)=SQRT(2*width/Rcurv)*575/m
+
+
