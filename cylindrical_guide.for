@@ -16,7 +16,7 @@
 		xloss(1,2)=-1.
 		xloss(2,2)=1.
 
-		IF (show) WRITE(*,10) isection, x, y, z, 
+		IF (show) WRITE(*,10) isection, x, y, z,
      &phiy*180./pi, phiz*180./pi
    10	FORMAT(' Section',I2,' : starting pt (x,y,z) = (',F8.2,',',
      &F7.2,',',F7.2,')  phiy=',F6.2,' deg   phiz=',F6.2,' deg')
@@ -34,7 +34,7 @@
 		yend0=yc2(isection)
 		zend0=0.
 
-		IF (show) WRITE(*,20) xstart0, ystart0, zstart0, 
+		IF (show) WRITE(*,20) xstart0, ystart0, zstart0,
      &xend0, yend0, zend0
    20	FORMAT(' Cylinder axis : (',F8.2,',',F7.2,',',F7.2,')  =>  (',
      &F8.2,',',F7.2,',',F7.2,')')
@@ -101,7 +101,7 @@
 		ELSE
 			xcross=(-B+SQRT(Det))/(2.*A)
 		END IF
-	
+
 		IF (xcross.GT.xexit) THEN	! no more reflections
 			IF (show) PRINT*,
      &'No further reflections from section',isection
@@ -143,7 +143,7 @@
 				L=L+SQRT((x-xold)**2+(y-yold)**2+(z-zold)**2)
 			END IF
 
-			IF (show) WRITE(*,210) 
+			IF (show) WRITE(*,210)
      &SQRT((x-xold)**2+(y-yold)**2+(z-zold)**2)
   210		FORMAT(' Flight path from last reflection =',F8.2,' mm')
 
@@ -180,8 +180,8 @@
  220		FORMAT(' Waviness angle =',F6.2,'  => theta=',F6.2,'deg')
 
 			Prefl=refl(isection,1,ABS(theta),lambda,ipol)
-  235		ran0=random(iseed)
-			IF (REAL(ran0).EQ.0.) GOTO 235
+c  235		ran0=random(iseed)
+c			IF (REAL(ran0).EQ.0.) GOTO 235
 
 			IF (ran0.GT.Prefl) THEN
 				IF (through) xloss(1,ipol)=x
@@ -229,4 +229,3 @@
 
  1000	RETURN
 		END
-

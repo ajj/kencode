@@ -62,11 +62,11 @@ GRAVITY SIDEWAYS
 !
 !-----------------------------------------------------
 NEUTRONS ! Number of neutrons [*3*], seed for random number generator (0 : take a random odd number)
- 100000    287349743
+ 1000000    287349743
 !
 !-----------------------------------------------------
 OUTPUT	! iresults and idebug
- 0  1
+ 0  0
 !
 !-----------------------------------------------------
 END INPUT
