@@ -10,7 +10,7 @@
 		REAL*8	L
 		LOGICAL	in, curved, hparabolic, vparabolic, outside, through, UCN
 		CHARACTER*1 Answer
-		REAL*4	xp(101), yp(101), zp(101)
+		REAL*4	xp(101), yp(101), zp(101), random
 
 		xold=x
 		yold=y
@@ -407,7 +407,8 @@ c			IF (show) PRINT*,'i =',i,'   xcross =',REAL(xcross)
 
 			Prefl=refl(isection,imin,ABS(theta),lambda,ipol)
   235		ran0=random(iseed)
-			IF (REAL(ran0).EQ.0.) GOTO 235
+c			PRINT*,'ran0=',ran0
+c			IF (REAL(ran0).EQ.0.) GOTO 235
 
 c check for chamfer effect
 			IF ((imin.LE.2 .OR. imin.GE.5) 
