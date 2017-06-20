@@ -50,7 +50,7 @@
 		IF (show) THEN
 			slopey=-gy*x/v**2+ay
 			slopez=-gz*x/v**2+az
-			WRITE(*,10) isection, x, y, z, 
+			WRITE(*,10) isection, x, y, z,
      &ATAN(slopey)*180./pi, ATAN(slopez)*180./pi
    10		FORMAT(' Section',I2,' : starting pt (x,y,z) = (',F8.2,',',
      &F7.2,',',F7.2,')  phiy=',F7.3,' deg   phiz=',F7.3,' deg')
@@ -84,7 +84,7 @@
 		IF (show) THEN
 			slopey=-gy*xentrance/v**2+ay
 			slopez=-gz*xentrance/v**2+az
-			WRITE(*,20) xentrance, yentrance, zentrance, 
+			WRITE(*,20) xentrance, yentrance, zentrance,
      &ATAN(slopey)*180./pi, ATAN(slopez)*180./pi
    20		FORMAT(' At entrance of section: (x,y,z) = (',F8.2,',',
      &F9.4,',',F9.4,')  phiy=',F7.3,' deg   phiz=',F7.3,' deg')
@@ -94,7 +94,7 @@
 		END IF
 
 		offsetmulti=0.
-		IF (2*(nmultiple(isection)/2).EQ.nmultiple(isection)) 
+		IF (2*(nmultiple(isection)/2).EQ.nmultiple(isection))
      &offsetmulti=-0.5
 
 		imulti=-10000
@@ -103,12 +103,12 @@
 		DO i=1,nmultiple(isection)
 			rm=REAL(i-(nmultiple(isection)+1)/2)+offsetmulti
 			ym=rm*(Wguide(isection,1)+gmultiple(isection))*COSphi
-			IF (yentrance.GT.ystart(isection,1)+ym .AND. 
-     &yentrance.LT.ystart(isection,2)+ym .AND. 
-     &zentrance.GT.zstart(isection,3) .AND. 
+			IF (yentrance.GT.ystart(isection,1)+ym .AND.
+     &yentrance.LT.ystart(isection,2)+ym .AND.
+     &zentrance.GT.zstart(isection,3) .AND.
      &zentrance.LT.zstart(isection,4)) THEN
 	 			imulti=i
-				IF (show) PRINT*,'ymin,max=',ystart(isection,1)+ym, 
+				IF (show) PRINT*,'ymin,max=',ystart(isection,1)+ym,
      &ystart(isection,2)+ym
 				GOTO 40
 			END IF
@@ -257,7 +257,7 @@ c			IF (show) PRINT*,'i =',i,'   xcross =',REAL(xcross)
 				IF (i.EQ.ilast) THEN
 					IF (xcross-xold.LT.0.1) GOTO 150
 					slope=-1.
-					IF ((i.LE.2 .OR. i.GE.5) 
+					IF ((i.LE.2 .OR. i.GE.5)
      &.AND. gy.NE.0.) slope=-gy*xcross/v**2+ay
 					IF ((i.EQ.3 .OR. i.EQ.4)
      &.AND. gz.NE.0.) slope=-gz*xcross/v**2+az
@@ -395,11 +395,11 @@ c			IF (show) PRINT*,'i =',i,'   xcross =',REAL(xcross)
 				dphig=0.
 			END IF
 			theta=phig0+dphig-phi0
-			IF (show) WRITE(*,220) phi0*180./pi, phig0*180./pi, 
+			IF (show) WRITE(*,220) phi0*180./pi, phig0*180./pi,
      &dphig*180./pi, theta*180./pi
   220		FORMAT(' Incident neutron angle =',F7.3,'  Guide angle =',F7.3,
      &'  Waviness angle =',F7.3,'  => theta=',F7.3,'deg')
-			IF (show) WRITE(*,230) 
+			IF (show) WRITE(*,230)
      &SQRT((x-xold)**2+(y-yold)**2+(z-zold)**2)
   230		FORMAT(' Flight path from last reflection =',F8.2,' mm')
 
@@ -407,11 +407,10 @@ c			IF (show) PRINT*,'i =',i,'   xcross =',REAL(xcross)
 
 			Prefl=refl(isection,imin,ABS(theta),lambda,ipol)
   235		ran0=random(iseed)
-c			PRINT*,'ran0=',ran0
-c			IF (REAL(ran0).EQ.0.) GOTO 235
+			IF (REAL(ran0).EQ.0.) GOTO 235
 
 c check for chamfer effect
-			IF ((imin.LE.2 .OR. imin.GE.5) 
+			IF ((imin.LE.2 .OR. imin.GE.5)
      &.AND. chamfer(isection,imin).GT.0.) THEN
 				a=ag(isection,3)
 				b=bg(isection,3)
@@ -422,9 +421,9 @@ c check for chamfer effect
 				IF (show) WRITE(*,237) z, z3, z4
   237			FORMAT(' Checking chamfer: z=',F8.3,
      &' z(bot)=',F8.3,' z(top)=',F8.3)
-				IF (ABS(z-z3).LT.chamfer(isection,imin) .OR. 
+				IF (ABS(z-z3).LT.chamfer(isection,imin) .OR.
      &ABS(z-z4).LT.chamfer(isection,imin)) ran0=2.
-			ELSE IF ((imin.EQ.3 .OR. imin.EQ.4) 
+			ELSE IF ((imin.EQ.3 .OR. imin.EQ.4)
      &.AND. chamfer(isection,imin).GT.0.) THEN
 				IF (curved) THEN
 					x01=x0(1)+xm
@@ -453,7 +452,7 @@ c check for chamfer effect
 				IF (show) WRITE(*,238) y, y1, y2
   238			FORMAT(' Checking chamfer: y=',F8.3,
      &' y(rhs)=',F8.3,' y(lhs)=',F8.3)
-				IF (ABS(y-y1).LT.chamfer(isection,imin) .OR. 
+				IF (ABS(y-y1).LT.chamfer(isection,imin) .OR.
      &ABS(y-y2).LT.chamfer(isection,imin)) ran0=2.
 			END IF
 
@@ -554,4 +553,3 @@ c check for chamfer effect
 
  1000	RETURN
 		END
-
